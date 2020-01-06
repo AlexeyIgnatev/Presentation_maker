@@ -1,28 +1,4 @@
-# def main():
-#     topic = input('Введите тему презентации: ')
-#     lang = int(input('Выберите язык презентации (1 - русский, 2 - английский)(введите цифру): '))
-#     if lang < 1 or lang > 2:
-#         print('Выбран некорректный язык!')
-#         exit(-1)
-#     lang = 'ru' if lang == 1 else 'en'
-#     wiki = Wiki()
-#     wiki.set_lang(lang)
-#     wiki.load_page(topic)
-#     wiki.clean_page()
-#     search_headers, headers = wiki.headers
-#     search_headers = ','.join(search_headers)
-#     docx = Docx()
-#     docx.create_document(wiki.content)
-#     docx.save_document()
-#     response = google_images_download.googleimagesdownload()
-#     absolute_image_paths = response.download({"keywords": search_headers, 'limit': 1})
-#     # pptx = Pptx()
-#     # pptx.create_presentation(headers, absolute_image_paths)
-#
-#
-# if __name__ == '__main__':
-#     main()
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from presentation_maker.pages.py.start_page import Ui_MainWindow as StartPage
 from presentation_maker.pages.py.second_page import Ui_MainWindow as Second_page
 import sys
@@ -31,6 +7,7 @@ from presentation_maker.wiki_api import Wiki
 from presentation_maker.docx_api import Docx
 from presentation_maker.pptx_api import Pptx
 from google_images_download import google_images_download
+
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -51,7 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_wiki(self):
         self.topic = self.ui.lineEdit.text()
         if self.topic.strip() == '':
-            QtWidgets.QMessageBox.about(self, 'Ошибка', 'Тема не должна быть пустой строкой')
+            self.warning_dialog("Тема не должна быть пустой строкой!")
             return
         index = self.ui.comboBox.currentIndex()
         lang = ''
@@ -65,10 +42,10 @@ class MainWindow(QtWidgets.QMainWindow):
         wiki.set_lang(lang)
         num = wiki.load_page(self.topic)
         if num == 1:
-            QtWidgets.QMessageBox.about(self, 'Ошибка', 'Введите корректный поисковой запрос!')
+            self.warning_dialog('Введите корректный поисковой запрос!')
             return
         if num == 2:
-            QtWidgets.QMessageBox.about(self, 'Ошибка', 'Информации по такому запросу не найдено!')
+            self.warning_dialog('Информации по такому запросу не найдено!')
             return
         wiki.clean_page()
         headers = wiki.headers
@@ -125,9 +102,15 @@ class MainWindow(QtWidgets.QMainWindow):
         pptx.create_presentation(self.topic, headers, absolute_image_paths)
         pptx.save_presentation()
         pptx.open_presentation()
-        QtWidgets.QMessageBox.about(self, 'Всё готово!', 'Презентация успешно создана.')
         self.start_page()
 
+    @staticmethod
+    def warning_dialog(message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Critical)
+        msg.setText(message)
+        msg.setWindowTitle("Ошибка")
+        msg.exec_()
 
 
 app = QtWidgets.QApplication([])
