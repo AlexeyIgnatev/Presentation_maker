@@ -1,7 +1,7 @@
 PyQt5
 langdetect
 python_pptx==0.6.18
-setuptools==42.0.2
+setuptools==65.5.1
 wikipedia==1.4.0
 python_docx==0.8.10
 google_images_download==2.8.0
